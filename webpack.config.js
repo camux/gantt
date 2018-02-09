@@ -3,7 +3,7 @@ var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 var path = require('path');
 var env = require('yargs').argv.mode;
 
-var libraryName = 'frappe-gantt';
+var libraryName = 'quick-gantt';
 
 var plugins = [], outputFile;
 
@@ -28,8 +28,11 @@ var config = {
 		loaders: [
 			{
 				test: /(\.jsx|\.js)$/,
-				loader: 'babel',
-				exclude: /(node_modules|bower_components)/
+				loader: 'babel-loader',
+				exclude: /(node_modules|bower_components)/,
+				// query: {
+				// 	presets: ['es2015', 'react']
+				// }
 			},
 			{
 				test: /(\.jsx|\.js)$/,
@@ -38,13 +41,13 @@ var config = {
 			},
 			{
 				test: /\.scss$/,
-				loaders: [ 'style', 'css?sourceMap', 'sass?sourceMap' ]
+				loaders: [ 'style-loader', 'css-loader?sourceMap', 'sass-loader?sourceMap' ]
 			}
 		]
 	},
 	resolve: {
-		root: path.resolve('./src'),
-		extensions: ['', '.js']
+		extensions: ['.js'],
+		symlinks: false
 	},
 	plugins: plugins
 };

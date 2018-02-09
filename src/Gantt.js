@@ -11,7 +11,7 @@ import './gantt.scss';
 import Bar from './Bar';
 import Arrow from './Arrow';
 
-export default function Gantt(element, tasks, config = {}) {
+export default function Gantt(element, tasks, config) {
 
 	const self = {};
 
@@ -32,8 +32,6 @@ export default function Gantt(element, tasks, config = {}) {
 
 	function set_defaults() {
 
-		const merge = require('deepmerge');
-
 		const defaults = {
 			header_height: 50,
 			column_width: 30,
@@ -46,8 +44,7 @@ export default function Gantt(element, tasks, config = {}) {
 				'Month'
 			],
 			bar: {
-				height: 20,
-				corner_radius: 3
+				height: 20
 			},
 			arrow: {
 				curve: 5
@@ -57,7 +54,7 @@ export default function Gantt(element, tasks, config = {}) {
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null
 		};
-		self.config = merge(defaults, config);
+		self.config = Object.assign({}, defaults, config);
 
 		reset_variables(tasks);
 	}
