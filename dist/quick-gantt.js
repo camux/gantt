@@ -655,16 +655,14 @@ function Gantt(element, items, tasks, config) {
 
 	function get_date_info(date, last_date, i) {
 		var change_ctx_date = true;
+		var adjust = 0;
 
 		if (last_date !== null) {
 			change_ctx_date = date.month() !== last_date.month();
 		} else {
+			adjust = self.config.column_width;
 			last_date = date.clone().add(1, 'year');
 		}
-
-		// if(!last_date) {
-		// 	last_date = date.clone().add(1, 'year');
-		// }
 
 		var date_text = {
 			'Quarter Day_lower': date.format('HH'),
@@ -685,17 +683,17 @@ function Gantt(element, items, tasks, config) {
 			upper_y: self.config.header_height - 25
 		};
 
+		// Center day upper
 		// const val = (self.config.column_width * 30) / 2;
-		var val = self.config.column_width / 2;
-		console.log('Day upper', val, date_text['Day_upper']);
-		// console.log('last_date', last_date);
+		var day_upper = self.config.column_width / 2 + adjust;
+
 		var x_pos = {
 			'Quarter Day_lower': self.config.column_width * 4 / 2,
 			'Quarter Day_upper': 0,
 			'Half Day_lower': self.config.column_width * 2 / 2,
 			'Half Day_upper': 0,
 			'Day_lower': self.config.column_width / 2,
-			'Day_upper': val,
+			'Day_upper': day_upper,
 			'Week_lower': 0,
 			'Week_upper': self.config.column_width * 4 / 2,
 			'Month_lower': self.config.column_width / 2,
