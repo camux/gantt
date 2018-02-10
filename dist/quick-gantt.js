@@ -97,7 +97,7 @@ var _Arrow2 = _interopRequireDefault(_Arrow);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function Gantt(element, tasks, config) {
+function Gantt(element, items, tasks, config) {
 
 	var self = {};
 
@@ -106,6 +106,7 @@ function Gantt(element, tasks, config) {
 
 		// expose methods
 		self.change_view_mode = change_view_mode;
+		self.change_view_range = change_view_range;
 		self.unselect_all = unselect_all;
 		self.view_is = view_is;
 		self.get_bar = get_bar;
@@ -114,6 +115,7 @@ function Gantt(element, tasks, config) {
 
 		// initialize with default view mode
 		change_view_mode(self.config.view_mode);
+		change_view_range(self.config.view_range);
 	}
 
 	function set_defaults() {
@@ -147,7 +149,7 @@ function Gantt(element, tasks, config) {
 		} else if (element instanceof HTMLElement) {
 			self.element = element.querySelector('svg');
 		} else {
-			throw new TypeError('Frappé Gantt only supports usage of a string CSS selector,' + ' HTML DOM element or SVG DOM element for the \'element\' parameter');
+			throw new TypeError('Quick Gantt only supports usage of a string CSS selector,' + ' HTML DOM element or SVG DOM element for the \'element\' parameter');
 		}
 
 		self._tasks = tasks;
@@ -168,6 +170,14 @@ function Gantt(element, tasks, config) {
 		render();
 		// fire viewmode_change event
 		trigger_event('view_change', [mode]);
+	}
+
+	function change_view_range(range) {
+		set_range(range);
+		// prepare();
+		// render();
+		// // fire viewmode_change event
+		// trigger_event('view_change', [range]);
 	}
 
 	function prepare() {
@@ -356,8 +366,13 @@ function Gantt(element, tasks, config) {
 			self.gantt_start = self.gantt_start.clone().startOf('year');
 			self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 		} else {
-			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'month');
-			self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'month');
+			if (self.config.view_range) {
+				self.gantt_start = self.gantt_start.clone().subtract(2, 'day');
+				self.gantt_end = self.gantt_end.clone().add(3, 'day');
+			} else {
+				self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'month');
+				self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'month');
+			}
 		}
 	}
 
@@ -372,6 +387,7 @@ function Gantt(element, tasks, config) {
 			} else {
 				cur_date = view_is('Month') ? cur_date.clone().add(1, 'month') : cur_date.clone().add(self.config.step, 'hours');
 			}
+			// console.log(cur_date);
 			self.dates.push(cur_date);
 		}
 	}
@@ -406,12 +422,16 @@ function Gantt(element, tasks, config) {
 		}
 	}
 
+	function set_range(range) {
+		self.config.view_range = range;
+	};
+
 	function set_scale(scale) {
 		self.config.view_mode = scale;
 
 		if (scale === 'Day') {
 			self.config.step = 24;
-			self.config.column_width = 38;
+			self.config.column_width = 70; // 38;
 		} else if (scale === 'Half Day') {
 			self.config.step = 24 / 2;
 			self.config.column_width = 38;
@@ -461,8 +481,8 @@ function Gantt(element, tasks, config) {
 
 	function make_grid_background() {
 
-		var grid_width = self.dates.length * self.config.column_width,
-		    grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self.tasks.length;
+		var grid_width = self.dates.length * self.config.column_width;
+		var grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self.tasks.length;
 
 		self.canvas.rect(0, 0, grid_width, grid_height).addClass('grid-background').appendTo(self.element_groups.grid);
 
@@ -473,17 +493,18 @@ function Gantt(element, tasks, config) {
 	}
 
 	function make_grid_header() {
-		var header_width = self.dates.length * self.config.column_width,
-		    header_height = self.config.header_height + 10;
+		var header_width = self.dates.length * self.config.column_width;
+		var header_height = self.config.header_height + 10;
 		self.canvas.rect(0, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
 	}
 
 	function make_grid_rows() {
 
-		var rows = self.canvas.group().appendTo(self.element_groups.grid),
-		    lines = self.canvas.group().appendTo(self.element_groups.grid),
-		    row_width = self.dates.length * self.config.column_width,
-		    row_height = self.config.bar.height + self.config.padding;
+		var rows = self.canvas.group().appendTo(self.element_groups.grid);
+		var lines = self.canvas.group().appendTo(self.element_groups.grid);
+		var row_width = self.dates.length * self.config.column_width;
+
+		var row_height = self.config.bar.height + self.config.padding;
 
 		var row_y = self.config.header_height + self.config.padding / 2;
 
@@ -518,9 +539,9 @@ function Gantt(element, tasks, config) {
 	}
 
 	function make_grid_ticks() {
-		var tick_x = 0,
-		    tick_y = self.config.header_height + self.config.padding / 2,
-		    tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
+		var tick_x = 0;
+		var tick_y = self.config.header_height + self.config.padding / 2;
+		var tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
 
 		var _iteratorNormalCompletion6 = true;
 		var _didIteratorError6 = false;
@@ -633,9 +654,18 @@ function Gantt(element, tasks, config) {
 	}
 
 	function get_date_info(date, last_date, i) {
-		if (!last_date) {
+		var change_ctx_date = true;
+
+		if (last_date !== null) {
+			change_ctx_date = date.month() !== last_date.month();
+		} else {
 			last_date = date.clone().add(1, 'year');
 		}
+
+		// if(!last_date) {
+		// 	last_date = date.clone().add(1, 'year');
+		// }
+
 		var date_text = {
 			'Quarter Day_lower': date.format('HH'),
 			'Half Day_lower': date.format('HH'),
@@ -644,8 +674,8 @@ function Gantt(element, tasks, config) {
 			'Month_lower': date.format('MMMM'),
 			'Quarter Day_upper': date.date() !== last_date.date() ? date.format('D MMM') : '',
 			'Half Day_upper': date.date() !== last_date.date() ? date.month() !== last_date.month() ? date.format('D MMM') : date.format('D') : '',
-			'Day_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
-			'Week_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
+			'Day_upper': change_ctx_date ? date.format('MMMM') : '',
+			'Week_upper': change_ctx_date ? date.format('MMMM') : '',
 			'Month_upper': date.year() !== last_date.year() ? date.format('YYYY') : ''
 		};
 
@@ -655,13 +685,17 @@ function Gantt(element, tasks, config) {
 			upper_y: self.config.header_height - 25
 		};
 
+		// const val = (self.config.column_width * 30) / 2;
+		var val = self.config.column_width / 2;
+		console.log('Day upper', val, date_text['Day_upper']);
+		// console.log('last_date', last_date);
 		var x_pos = {
 			'Quarter Day_lower': self.config.column_width * 4 / 2,
 			'Quarter Day_upper': 0,
 			'Half Day_lower': self.config.column_width * 2 / 2,
 			'Half Day_upper': 0,
 			'Day_lower': self.config.column_width / 2,
-			'Day_upper': self.config.column_width * 30 / 2,
+			'Day_upper': val,
 			'Week_lower': 0,
 			'Week_upper': self.config.column_width * 4 / 2,
 			'Month_lower': self.config.column_width / 2,
@@ -843,8 +877,10 @@ function Gantt(element, tasks, config) {
 /**
  * Gantt:
  * 	element: querySelector string, HTML DOM or SVG DOM element, required
+ * 	items: object with domain of activities/items
+ *    item: { idItem: nameItem }
  * 	tasks: array of tasks, required
- *   task: { id, name, start, end, progress, dependencies, custom_class }
+ *    task: { id, name, start, end, progress, dependencies, custom_class }
  * 	config: configuration options, optional
  */
 module.exports = exports['default'];
