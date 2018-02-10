@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
-var path = require('path');
 var env = require('yargs').argv.mode;
 
 var libraryName = 'quick-gantt';
@@ -29,10 +28,7 @@ var config = {
 			{
 				test: /(\.jsx|\.js)$/,
 				loader: 'babel-loader',
-				exclude: /(node_modules|bower_components)/,
-				// query: {
-				// 	presets: ['es2015', 'react']
-				// }
+				exclude: /(node_modules|bower_components)/
 			},
 			{
 				test: /(\.jsx|\.js)$/,

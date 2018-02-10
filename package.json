@@ -1,33 +1,14 @@
 {
-  "_from": "quick-gantt",
-  "_id": "quick-gantt@0.0.7",
-  "_inBundle": false,
-  "_integrity": "sha1-etv2uoMH5iU13e8jrr6wLBKOVDo=",
-  "_location": "/quick-gantt",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "quick-gantt",
-    "name": "quick-gantt",
-    "escapedName": "quick-gantt",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/frappe-gantt/-/frappe-gantt-0.0.7.tgz",
-  "_shasum": "7adbf6ba8307e62535ddef23aebeb02c128e543a",
-  "_spec": "frappe-gantt",
-  "_where": "/mnt/Data/Seafile/Development/TRYTON/TRYTON-4.4/FLASK/react-flask-hotel",
+  "name": "quick-gantt",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/quick-gantt.js",
   "author": {
-    "name": "Faris Ansari"
+    "name": "Oscar Alvarez"
   },
   "bugs": {
-    "url": "https://github.com/frappe/gantt/issues"
+    "url": "https://github.com/camux/quick-gantt/issues"
   },
   "bundleDependencies": false,
   "dependencies": {
@@ -54,7 +35,7 @@
     "webpack": "^3.10.0",
     "yargs": "3.32.0"
   },
-  "homepage": "https://github.com/frappe/gantt",
+  "homepage": "https://github.com/camux/quick-gantt",
   "keywords": [
     "gantt",
     "svg",
@@ -63,17 +44,13 @@
     "interactive gantt",
     "project management"
   ],
-  "license": "MIT",
-  "main": "dist/quick-gantt.js",
-  "name": "quick-gantt",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/camux/quick-gantt.git"
   },
   "scripts": {
-    "build": "webpack --mode=build",
+    "build": "webpack --mode=build --preserve-symlinks",
     "dev": "webpack --progress --colors --watch --mode=dev",
     "test": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js"
-  },
-  "version": "0.0.7"
+  }
 }
