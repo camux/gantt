@@ -60,8 +60,6 @@ export default function Gantt(element, items, tasks, config) {
 			custom_popup_html: null
 		};
 		self.config = Object.assign({}, defaults, config);
-		// Add labels space
-		// self.label_width = self.config.label_width;
 
 		reset_variables(tasks, items);
 	}
