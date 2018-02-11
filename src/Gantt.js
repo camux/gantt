@@ -49,12 +49,12 @@ export default function Gantt(element, items, tasks, config) {
 				'Month'
 			],
 			bar: {
-				height: 20
+				height: 28
 			},
 			arrow: {
 				curve: 5
 			},
-			padding: 18,
+			padding: 10,
 			view_mode: 'Day',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null
@@ -228,7 +228,7 @@ export default function Gantt(element, items, tasks, config) {
 			self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 		} else {
 			if (self.config.view_range) {
-				self.gantt_start = self.gantt_start.clone().subtract(2, 'day');
+				self.gantt_start = self.gantt_start.clone().subtract(1, 'day');
 				self.gantt_end = self.gantt_end.clone().add(3, 'day');
 			} else {
 				self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'month');
@@ -341,7 +341,7 @@ export default function Gantt(element, items, tasks, config) {
 
 	function make_grid_header() {
 		const header_width = self.config.label_width + (self.dates.length * self.config.column_width);
-		const header_height = self.config.header_height + 10;
+		const header_height = self.config.header_height + (self.config.padding / 2);
 		self.canvas.rect(0, 0, header_width, header_height)
 			.addClass('grid-header')
 			.appendTo(self.element_groups.grid);
@@ -374,7 +374,6 @@ export default function Gantt(element, items, tasks, config) {
 		let tick_x = self.config.label_width;
 		let tick_y = self.config.header_height + self.config.padding / 2;
 		let tick_height = (self.config.bar.height + self.config.padding) * self._items.size;
-
 		for(let date of self.dates) {
 			let tick_class = 'tick';
 			// thick tick for monday
@@ -425,9 +424,9 @@ export default function Gantt(element, items, tasks, config) {
 
 	function make_grid_labels() {
 
-		const item_x = 0;
+		const item_x = 15;
 		var step = self.config.bar.height + self.config.padding;
-		var item_y = self.config.header_height + self.config.padding - 3 + (step / 2);
+		var item_y = self.config.header_height + self.config.padding + (step / 2);
 		for(let item_text of self._items.values()) {
 			self.canvas.text(item_x, item_y, item_text)
 				.addClass('item-text')
