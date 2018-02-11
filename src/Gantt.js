@@ -39,6 +39,7 @@ export default function Gantt(element, items, tasks, config) {
 		const defaults = {
 			header_height: 50,
 			column_width: 30,
+			label_width: 140,
 			step: 24,
 			view_modes: [
 				'Quarter Day',
@@ -59,8 +60,10 @@ export default function Gantt(element, items, tasks, config) {
 			custom_popup_html: null
 		};
 		self.config = Object.assign({}, defaults, config);
+		// Add labels space
+		// self.label_width = self.config.label_width;
 
-		reset_variables(tasks);
+		reset_variables(tasks, items);
 	}
 
 	function reset_variables(tasks) {
@@ -76,6 +79,7 @@ export default function Gantt(element, items, tasks, config) {
 		}
 
 		self._tasks = tasks;
+		self._items = items;
 
 		self._bars = [];
 		self._arrows = [];
@@ -248,14 +252,14 @@ export default function Gantt(element, items, tasks, config) {
 					cur_date.clone().add(1, 'month') :
 					cur_date.clone().add(self.config.step, 'hours');
 			}
-			// console.log(cur_date);
+
 			self.dates.push(cur_date);
 		}
 	}
 
 	function setup_groups() {
 
-		const groups = ['grid', 'date', 'arrow', 'progress', 'bar', 'details'];
+		const groups = ['grid', 'date', 'arrow', 'progress', 'bar', 'details', 'labels'];
 		// make group layers
 		for(let group of groups) {
 			self.element_groups[group] = self.canvas.group().attr({'id': group});
@@ -316,13 +320,14 @@ export default function Gantt(element, items, tasks, config) {
 		make_grid_background();
 		make_grid_rows();
 		make_grid_header();
+		make_grid_labels();
 		make_grid_ticks();
 		make_grid_highlights();
 	}
 
 	function make_grid_background() {
 
-		const grid_width = self.dates.length * self.config.column_width;
+		const grid_width = self.config.label_width + (self.dates.length * self.config.column_width);
 		const grid_height = self.config.header_height + self.config.padding +
 				(self.config.bar.height + self.config.padding) * self.tasks.length;
 
@@ -337,7 +342,7 @@ export default function Gantt(element, items, tasks, config) {
 	}
 
 	function make_grid_header() {
-		const header_width = self.dates.length * self.config.column_width;
+		const header_width = self.config.label_width + (self.dates.length * self.config.column_width);
 		const header_height = self.config.header_height + 10;
 		self.canvas.rect(0, 0, header_width, header_height)
 			.addClass('grid-header')
@@ -345,16 +350,16 @@ export default function Gantt(element, items, tasks, config) {
 	}
 
 	function make_grid_rows() {
-
 		const rows = self.canvas.group().appendTo(self.element_groups.grid);
 		const lines = self.canvas.group().appendTo(self.element_groups.grid);
-		const row_width = self.dates.length * self.config.column_width;
+		const label_width = self.config.column_width * 2;
+		const row_width = label_width + (self.dates.length * self.config.column_width);
 
 		const row_height = self.config.bar.height + self.config.padding;
 
 		let row_y = self.config.header_height + self.config.padding / 2;
 
-		for(let task of self.tasks) { // eslint-disable-line
+		for(let task of self._items) { // eslint-disable-line
 			self.canvas.rect(0, row_y, row_width, row_height)
 				.addClass('grid-row')
 				.appendTo(rows);
@@ -368,9 +373,9 @@ export default function Gantt(element, items, tasks, config) {
 	}
 
 	function make_grid_ticks() {
-		let tick_x = 0;
+		let tick_x = self.config.label_width;
 		let tick_y = self.config.header_height + self.config.padding / 2;
-		let tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
+		let tick_height = (self.config.bar.height + self.config.padding) * self._items.size;
 
 		for(let date of self.dates) {
 			let tick_class = 'tick';
@@ -420,7 +425,27 @@ export default function Gantt(element, items, tasks, config) {
 		}
 	}
 
+	function make_grid_labels() {
+
+		const item_x = 0;
+		var step = self.config.bar.height + self.config.padding;
+		var item_y = self.config.header_height + self.config.padding - 3 + (step / 2);
+		for(let item_text of self._items.values()) {
+			self.canvas.text(item_x, item_y, item_text)
+				.addClass('item-text')
+				.appendTo(self.element_groups.labels);
+			item_y += step;
+		}
+	}
+
 	function make_dates() {
+		// First keep label text for items in header
+		var label_x = 0;
+		var label_y = 0;
+		var label_text = 'Items';
+		self.canvas.text(label_x, label_y, label_text)
+			.addClass('label-text')
+			.appendTo(self.element_groups.date);
 
 		for(let date of get_dates_to_draw()) {
 			self.canvas.text(date.lower_x, date.lower_y, date.lower_text)
@@ -478,7 +503,7 @@ export default function Gantt(element, items, tasks, config) {
 		};
 
 		const base_pos = {
-			x: i * self.config.column_width,
+			x: self.config.label_width + (i * self.config.column_width),
 			lower_y: self.config.header_height,
 			upper_y: self.config.header_height - 25
 		};

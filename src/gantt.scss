@@ -1,6 +1,7 @@
 $bar-color: #b8c2cc;
 $bar-stroke: #8D99A6;
 $border-color: #e0e0e0;
+$border-tick-color: #a6a7a8;
 $light-bg: #f5f5f5;
 $light-border-color: #ebeff2;
 $light-yellow: #fcf8e3;
@@ -33,7 +34,7 @@ $handle-color: #ddd;
 		stroke: $light-border-color;
 	}
 	.tick {
-		stroke: $border-color;
+		stroke: $border-tick-color;
 		stroke-width: 0.2;
 		&.thick {
 			stroke-width: 0.4;
@@ -120,6 +121,10 @@ $handle-color: #ddd;
 	}
 	.lower-text {
 		fill: $text-color;
+	}
+	.item-text {
+		fill: $text-color;
+		font-size: 14px;
 	}
 
 	#details .details-container {
