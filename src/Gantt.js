@@ -23,6 +23,7 @@ export default function Gantt(element, items, tasks, config) {
 		// expose methods
 		self.change_view_mode = change_view_mode;
 		self.change_view_range = change_view_range;
+		self.on_date_change = on_date_change;
 		self.unselect_all = unselect_all;
 		self.view_is = view_is;
 		self.get_bar = get_bar;
@@ -30,6 +31,7 @@ export default function Gantt(element, items, tasks, config) {
 		self.refresh = refresh;
 
 		// initialize with default view mode
+		on_date_change(self.config.start_date);
 		change_view_mode(self.config.view_mode);
 		change_view_range(self.config.view_range);
 	}
@@ -57,6 +59,7 @@ export default function Gantt(element, items, tasks, config) {
 			padding: 10,
 			view_mode: 'Day',
 			view_range: 30,
+			start_date: moment(),
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null
 		};
@@ -105,6 +108,14 @@ export default function Gantt(element, items, tasks, config) {
 
 	function change_view_range(range) {
 		set_range(range);
+		prepare();
+		render();
+		// // fire viewmode_change event
+		// trigger_event('view_change', [range]);
+	}
+
+	function on_date_change(start_date) {
+		self.start_date = start_date;
 		prepare();
 		render();
 		// // fire viewmode_change event
@@ -185,15 +196,21 @@ export default function Gantt(element, items, tasks, config) {
 	}
 
 	function prepare_dates() {
-
 		self.gantt_start = self.gantt_end = null;
-		for(let task of self.tasks) {
-			// set global start and end date
-			if(!self.gantt_start || task._start < self.gantt_start) {
-				self.gantt_start = task._start;
+		if (self.tasks.length > 0) {
+			for(let task of self.tasks) {
+				// set global start and end date
+				if(!self.gantt_start || task._start < self.gantt_start) {
+					self.gantt_start = task._start;
+				}
+				if(!self.gantt_end || task._end > self.gantt_end) {
+					self.gantt_end = task._end;
+				}
 			}
-			if(!self.gantt_end || task._end > self.gantt_end) {
-				self.gantt_end = task._end;
+		} else {
+			if (self.start_date) {
+				self.gantt_start = self.start_date;
+				self.gantt_end = self.gantt_start.clone().add(self.config.view_range, 'day');
 			}
 		}
 		set_gantt_dates();
@@ -314,10 +331,16 @@ export default function Gantt(element, items, tasks, config) {
 	}
 
 	function get_min_date() {
-		const task = self.tasks.reduce((acc, curr) => {
-			return curr._start.isSameOrBefore(acc._start) ? curr : acc;
-		});
-		return task._start;
+		var start = null;
+		if (self.tasks.length > 0) {
+			const task = self.tasks.reduce((acc, curr) => {
+				return curr._start.isSameOrBefore(acc._start) ? curr : acc;
+			});
+			start = task._start;
+		} else {
+			start = self.gantt_start;
+		}
+		return start;
 	}
 
 	function make_grid() {
