@@ -79,7 +79,6 @@ export default function Bar(gt, task) {
 		if (self.invalid) {
 			self.$bar.addClass('bar-invalid');
 		}
-		console.log('C   >  ', self.task.color);
 		if (self.task.color) {
 			self.$bar.attr('fill', self.task.color);
 		}

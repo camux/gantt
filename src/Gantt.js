@@ -415,11 +415,12 @@ export default function Gantt(element, items, tasks, config) {
 
 		// highlight today's date
 		if(view_is('Day')) {
-			const x = moment().startOf('day').diff(self.gantt_start, 'hours') /
+			let x = moment().startOf('day').diff(self.gantt_start, 'hours') /
 					self.config.step * self.config.column_width;
+			x = x + self.config.label_width;
 			const y = 0;
 			const width = self.config.column_width;
-			const height = (self.config.bar.height + self.config.padding) * self.tasks.length +
+			const height = (self.config.bar.height + self.config.padding) * self._items.size +
 				self.config.header_height + self.config.padding / 2;
 
 			self.canvas.rect(x, y, width, height)
