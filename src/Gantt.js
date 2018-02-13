@@ -56,12 +56,13 @@ export default function Gantt(element, items, tasks, config) {
 			},
 			padding: 10,
 			view_mode: 'Day',
+			view_range: 30,
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null
 		};
 		self.config = Object.assign({}, defaults, config);
 
-		reset_variables(tasks, items);
+		reset_variables(tasks);
 	}
 
 	function reset_variables(tasks) {
@@ -78,7 +79,12 @@ export default function Gantt(element, items, tasks, config) {
 
 		self._tasks = tasks;
 		self._items = items;
-
+		self.itemsIndex = new Map();
+		let index = 0;
+		for (let key of items.keys()) {
+			self.itemsIndex.set(key, index);
+			index += 1;
+		}
 		self._bars = [];
 		self._arrows = [];
 		self.element_groups = {};
@@ -99,8 +105,8 @@ export default function Gantt(element, items, tasks, config) {
 
 	function change_view_range(range) {
 		set_range(range);
-		// prepare();
-		// render();
+		prepare();
+		render();
 		// // fire viewmode_change event
 		// trigger_event('view_change', [range]);
 	}
@@ -229,7 +235,7 @@ export default function Gantt(element, items, tasks, config) {
 		} else {
 			if (self.config.view_range) {
 				self.gantt_start = self.gantt_start.clone().subtract(1, 'day');
-				self.gantt_end = self.gantt_end.clone().add(3, 'day');
+				self.gantt_end = self.gantt_start.clone().add(self.config.view_range, 'day');
 			} else {
 				self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'month');
 				self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'month');

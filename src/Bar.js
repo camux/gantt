@@ -64,6 +64,7 @@ export default function Bar(gt, task) {
 
 	function draw() {
 		draw_bar();
+		// draw_state_bar();
 		draw_progress_bar();
 		draw_label();
 		draw_resize_handles();
@@ -77,6 +78,10 @@ export default function Bar(gt, task) {
 			.appendTo(self.bar_group);
 		if (self.invalid) {
 			self.$bar.addClass('bar-invalid');
+		}
+		console.log('C   >  ', self.task.color);
+		if (self.task.color) {
+			self.$bar.attr('fill', self.task.color);
 		}
 	}
 
@@ -449,8 +454,9 @@ export default function Bar(gt, task) {
 	}
 
 	function compute_y() {
+		const _index = gt.itemsIndex.get(self.task.id);
 		return gt.config.header_height + gt.config.padding +
-			self.task._index * (self.height + gt.config.padding);
+			_index * (self.height + gt.config.padding);
 	}
 
 	function get_snap_position(dx) {
