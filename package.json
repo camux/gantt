@@ -1,7 +1,7 @@
 {
   "name": "quick-gantt",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "main": "dist/quick-gantt.js",
   "author": {
@@ -39,10 +39,8 @@
   "keywords": [
     "gantt",
     "svg",
-    "simple gantt",
-    "project timeline",
-    "interactive gantt",
-    "project management"
+    "project",
+    "react"
   ],
   "repository": {
     "type": "git",
