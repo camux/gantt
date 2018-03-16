@@ -9,7 +9,6 @@
  * 	config: configuration options, optional
  */
 import './gantt.scss';
-
 import Bar from './Bar';
 import Arrow from './Arrow';
 
@@ -30,10 +29,9 @@ export default function Gantt(element, items, tasks, config) {
 		self.trigger_event = trigger_event;
 		self.refresh = refresh;
 
-		// initialize with default view mode
+		// initialize canvas
+		renderInit();
 		on_date_change(self.config.start_date);
-		change_view_mode(self.config.view_mode);
-		change_view_range(self.config.view_range);
 	}
 
 	function set_defaults() {
@@ -109,7 +107,7 @@ export default function Gantt(element, items, tasks, config) {
 	function change_view_range(range) {
 		set_range(range);
 		prepare();
-		render();
+		// render();
 		// // fire viewmode_change event
 		// trigger_event('view_change', [range]);
 	}
@@ -222,10 +220,26 @@ export default function Gantt(element, items, tasks, config) {
 		self.canvas = Snap(self.element).addClass('gantt');
 	}
 
+	function renderInit() {
+		prepare_canvas();
+		setup_groups();
+		clear();
+	}
+
 	function render() {
 		clear();
 		setup_groups();
 		make_grid();
+		renderBars();
+	}
+
+	function clear() {
+		self.canvas.clear();
+		self._bars = [];
+		self._arrows = [];
+	}
+
+	function renderBars() {
 		make_dates();
 		make_bars();
 		make_arrows();
@@ -233,12 +247,6 @@ export default function Gantt(element, items, tasks, config) {
 		set_width();
 		set_scroll_position();
 		bind_grid_click();
-	}
-
-	function clear() {
-		self.canvas.clear();
-		self._bars = [];
-		self._arrows = [];
 	}
 
 	function set_gantt_dates() {
@@ -279,7 +287,7 @@ export default function Gantt(element, items, tasks, config) {
 	}
 
 	function setup_groups() {
-
+		self.element_groups = {};
 		const groups = ['grid', 'date', 'arrow', 'progress', 'bar', 'details', 'labels'];
 		// make group layers
 		for(let group of groups) {
@@ -356,14 +364,14 @@ export default function Gantt(element, items, tasks, config) {
 
 		const grid_width = self.config.label_width + (self.dates.length * self.config.column_width);
 		const grid_height = self.config.header_height + self.config.padding +
-				(self.config.bar.height + self.config.padding) * self.tasks.length;
+				((self.config.bar.height + self.config.padding) * self._items.size);
 
 		self.canvas.rect(0, 0, grid_width, grid_height)
 			.addClass('grid-background')
 			.appendTo(self.element_groups.grid);
 
 		self.canvas.attr({
-			height: grid_height + self.config.padding + 100,
+			height: grid_height + self.config.padding + 10,
 			width: '100%'
 		});
 	}
@@ -385,7 +393,7 @@ export default function Gantt(element, items, tasks, config) {
 		const row_height = self.config.bar.height + self.config.padding;
 
 		let row_y = self.config.header_height + self.config.padding / 2;
-
+		// row_y = row_y + 40;
 		for(let task of self._items) { // eslint-disable-line
 			self.canvas.rect(0, row_y, row_width, row_height)
 				.addClass('grid-row')

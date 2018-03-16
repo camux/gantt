@@ -7,13 +7,13 @@ A simple, interactive, modern gantt chart library for the web
 
 ### Install
 ```
-npm install frappe-gantt
+npm install quickgantt
 ```
 
 ### Usage
 Include it in your html:
 ```
-<script src="frappe-gantt.min.js"></script>
+<script src="quick-gantt.min.js"></script>
 ```
 
 And start hacking:
@@ -40,7 +40,16 @@ If you want to contribute:
 3. `npm install`
 4. `npm run dev`
 
+
+For build try write:
+
+```
+webpack --env.mode=build
+```
+
+
+
 License: MIT
 
 ------------------
-Project maintained by [frappe](https://github.com/frappe)
+Project maintained by [Presik](https://github.com/quickgantt)
